@@ -1,0 +1,127 @@
+﻿<Page
+    x:Class="UwpApp.Views.DatasetGenerationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UwpApp.Views"
+    xmlns:viewmodels="using:UwpApp.ViewModels"
+    xmlns:controls="using:UwpApp.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:interact="using:Microsoft.Xaml.Interactivity"
+    xmlns:interactcore="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:converters="using:UwpApp.ViewModels.Converters"
+    xmlns:dataset="using:UwpApp.MachineLearning.Datasets"
+    mc:Ignorable="d"
+    Background="White"
+    DataContext="{Binding Source={StaticResource ViewModelLocator}, Path=DatasetGenerationPageViewModel}">
+
+    <Page.Resources>
+        <converters:ImageTappedEventCommandParameterConverter x:Key="EventParametersConverter"/>
+    </Page.Resources>
+
+    <Grid Background="{StaticResource DarkViolet}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1" Padding="10">
+            <Image x:Name="SourceImage" Source="{Binding ImageSource}">
+                <interact:Interaction.Behaviors>
+                    <interactcore:EventTriggerBehavior EventName="PointerPressed">
+                        <interactcore:InvokeCommandAction Command="{Binding ImageTappedCommand}"
+                                                          InputConverter="{StaticResource EventParametersConverter}">
+                            <interactcore:InvokeCommandAction.InputConverterParameter>
+                                <converters:ImageTappedEventInputConverterParameter Sender="{x:Bind SourceImage}"
+                                                                                    Rectangle="{x:Bind SelectionRect}"
+                                                                                    Canvas="{x:Bind Canvas}"/>
+                            </interactcore:InvokeCommandAction.InputConverterParameter>
+                        </interactcore:InvokeCommandAction>
+                    </interactcore:EventTriggerBehavior>
+                </interact:Interaction.Behaviors>
+            </Image>
+            <Canvas x:Name="Canvas">
+                <Rectangle x:Name="SelectionRect" Visibility="Collapsed"
+                           Stroke="Yellow" StrokeThickness="1" Fill="Transparent"
+                           Canvas.Left="0" Canvas.Top="0">
+                    <interact:Interaction.Behaviors>
+                        <interactcore:EventTriggerBehavior EventName="PointerPressed">
+                            <interactcore:InvokeCommandAction Command="{Binding ImageTappedCommand}"
+                                                          InputConverter="{StaticResource EventParametersConverter}">
+                                <interactcore:InvokeCommandAction.InputConverterParameter>
+                                    <converters:ImageTappedEventInputConverterParameter Sender="{x:Bind SourceImage}"
+                                                                                    Rectangle="{x:Bind SelectionRect}"
+                                                                                    Canvas="{x:Bind Canvas}"/>
+                                </interactcore:InvokeCommandAction.InputConverterParameter>
+                            </interactcore:InvokeCommandAction>
+                        </interactcore:EventTriggerBehavior>
+                    </interact:Interaction.Behaviors>
+                </Rectangle>
+            </Canvas>
+        </Grid>
+
+        <Grid Grid.Row="0" Background="LightGray">
+            <RelativePanel HorizontalAlignment="Stretch" Padding="10">
+                <StackPanel x:Name="panel1" RelativePanel.LeftOf="splitter" 
+                            RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
+                    <StackPanel Background="{StaticResource Gray}" Margin="5">
+                        <controls:FilePicker Header="Image path:" File="{Binding ImageFile, Mode=TwoWay}" FileTypes=".jpg .png .jpeg"/>
+
+                        <ToggleSwitch IsOn="{Binding AutoPick, Mode=TwoWay}" Header="Auto pick" Margin="5"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Padding="5" Margin="5" Background="{StaticResource Gray}">
+                        <TextBlock FontSize="18" VerticalAlignment="Center" Margin="0,0,5,0">
+                            <Run>Dataset size:</Run>
+                            <Run Foreground="DodgerBlue" Text="{Binding DatasetSize}"/>
+                        </TextBlock>
+                        
+                        <Button Content="Retrain models" Command="{Binding RetrainModelsCommand}" Style="{StaticResource VioletButton}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Rectangle x:Name="splitter" Style="{StaticResource VerticalSplitter}"
+                           RelativePanel.LeftOf="panel2" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignBottomWithPanel="True"/>
+
+                <StackPanel Orientation="Horizontal" x:Name="panel2" 
+                            RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
+                    <controls:PixelImage PixelWidth="{Binding SlidingWindowSize}" PixelHeight="{Binding SlidingWindowSize}"
+                                 Pixels="{Binding SelectedArea}"
+                                 Grid.Row="0" Grid.Column="0"
+                                 MinWidth="200" MinHeight="200" Margin="10"/>
+
+                    <StackPanel Padding="10" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Grid.Row="0" Grid.Column="1">
+                        <Button Style="{StaticResource GroupedButtonTop}" Content="Horizontal" Command="{Binding AddPatternCommand}">
+                            <Button.CommandParameter>
+                                <dataset:EdgeType>Horizontal</dataset:EdgeType>
+                            </Button.CommandParameter>
+                        </Button>
+                        <Button Style="{StaticResource GroupedButtonInner}" Content="Vertical" Command="{Binding AddPatternCommand}">
+                            <Button.CommandParameter>
+                                <dataset:EdgeType>Vertical</dataset:EdgeType>
+                            </Button.CommandParameter>
+                        </Button>
+                        <Button Style="{StaticResource GroupedButtonInner}" Content="Diagonal" Command="{Binding AddPatternCommand}">
+                            <Button.CommandParameter>
+                                <dataset:EdgeType>Diagonal</dataset:EdgeType>
+                            </Button.CommandParameter>
+                        </Button>
+                        <Button Style="{StaticResource GroupedButtonInner}" Content="Reverse diagonal" Command="{Binding AddPatternCommand}">
+                            <Button.CommandParameter>
+                                <dataset:EdgeType>ReverseDiagonal</dataset:EdgeType>
+                            </Button.CommandParameter>
+                        </Button>
+                        <Button Style="{StaticResource GroupedButtonBottom}" Content="Not edge" Command="{Binding AddPatternCommand}">
+                            <Button.CommandParameter>
+                                <dataset:EdgeType>NonEdge</dataset:EdgeType>
+                            </Button.CommandParameter>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </RelativePanel>
+        </Grid>
+
+        <controls:LoadingView IsLoading="{Binding IsLoading}" LoadingLabel="Retraining models..." Grid.RowSpan="2"/>
+    </Grid>
+</Page>

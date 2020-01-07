@@ -1,0 +1,25 @@
+﻿<ContentDialog
+    x:Class="UwpApp.Mvvm.Views.SaveImageDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UwpApp.Mvvm.Views"
+    xmlns:viewModels="using:UwpApp.Mvvm.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Save image to gallery?"
+    PrimaryButtonText="Save" PrimaryButtonClick="CloseDialog"
+    SecondaryButtonText="Cancel" CloseButtonClick="CloseDialog">
+
+    <ContentDialog.DataContext>
+        <viewModels:SaveDialogViewModel/>
+    </ContentDialog.DataContext>
+
+    <ContentDialog.PrimaryButtonCommand>
+        <StandardUICommand Command="{Binding SaveImageCommand}"/>
+    </ContentDialog.PrimaryButtonCommand>
+
+    <Grid>
+        <TextBox Text="{Binding ImageName, Mode=TwoWay}" PlaceholderText="Enter image name..." Header="Image name:"/>
+    </Grid>
+</ContentDialog>

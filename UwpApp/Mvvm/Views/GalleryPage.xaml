@@ -1,0 +1,62 @@
+﻿<Page 
+    x:Class="UwpApp.Mvvm.Views.GalleryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UwpApp.Mvvm.Views"
+    xmlns:viewModels="using:UwpApp.Mvvm.ViewModels"
+    xmlns:interact="using:Microsoft.Xaml.Interactivity"
+    xmlns:interactcore="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:UwpApp.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{Binding Source={StaticResource ViewModelLocator}, Path=GalleryPageViewModel}">
+
+    <Grid Background="{StaticResource DarkViolet}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid Background="{StaticResource Gray}" Padding="10">
+            <Button Content="Refresh" Style="{StaticResource VioletButton}" Command="{Binding RefreshCommand}"/>
+        </Grid>
+
+        <GridView Grid.Row="1" Style="{StaticResource GalleryGridViewStyle}" 
+                  IsItemClickEnabled="True" ItemsSource="{Binding Gallery.Images}">
+            <interact:Interaction.Behaviors>
+                <interactcore:EventTriggerBehavior EventName="ItemClick">
+                    <interactcore:InvokeCommandAction Command="{Binding PickImageCommand}"/>
+                </interactcore:EventTriggerBehavior>
+            </interact:Interaction.Behaviors>
+        </GridView>
+        
+        <Grid Grid.Row="1" Background="LightGray" Visibility="{Binding IsImagePicked, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid.Transitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition/>
+                </TransitionCollection>
+            </Grid.Transitions>
+            <StackPanel Orientation="Horizontal" Background="Gray" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <FontIcon Margin="2" Glyph="&#xE74D;" Foreground="red" FontSize="24">
+                    <interact:Interaction.Behaviors>
+                        <interactcore:EventTriggerBehavior EventName="Tapped">
+                            <interactcore:InvokeCommandAction Command="{Binding UnPickImageCommand}"/>
+                        </interactcore:EventTriggerBehavior>
+                    </interact:Interaction.Behaviors>
+                </FontIcon>
+                <FontIcon Margin="2" Glyph="&#xE711;" FontSize="24">
+                    <interact:Interaction.Behaviors>
+                        <interactcore:EventTriggerBehavior EventName="Tapped">
+                            <interactcore:InvokeCommandAction Command="{Binding UnPickImageCommand}"/>
+                        </interactcore:EventTriggerBehavior>
+                    </interact:Interaction.Behaviors>
+                </FontIcon>
+            </StackPanel>
+            <Image Source="{Binding PickedImage}"/>
+        </Grid>
+        
+        <controls:LoadingView IsLoading="{Binding IsLoading}" LoadingLabel="Loading images..." Grid.RowSpan="2"/>
+    </Grid>
+</Page>
